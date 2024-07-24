@@ -8,6 +8,8 @@ The Python code runs on Zapier and receives data sent from Typeform to communica
 
 The steps are:
 
+![image](https://github.com/user-attachments/assets/83ffb495-5002-4f3a-838d-9c3d69d9baaf)
+
 ## I. Typeform
 
 Manager picks what action should be done:
