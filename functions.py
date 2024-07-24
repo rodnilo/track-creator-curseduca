@@ -381,4 +381,4 @@ def restore_enrollments(enrollments, token):
     for i in enrollments:
         endpoint = endpoint_restore_enrollments + f"/{i}/restore"
         response = requests.patch(endpoint, headers=headers, json=body)
-        print(response)
+        return enrollments
