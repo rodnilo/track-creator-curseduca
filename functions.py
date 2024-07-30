@@ -44,44 +44,6 @@ def auth():
     access_token = response_json['accessToken']
     return access_token
 
-def register_with_contents(token, name, email, conteudos_selecionados, conteudos):
-    """
-    Função que tem como objetivo fazer o fluxo principal de cadastro dos colaboradores:
-    1. cadastrando o usuário na plataforma (obrigatório)
-    2. concomitantemente matriculando nos conteúdos (opcional)
-
-    :param token: token de acesso recebido na função auth
-    :param name: nome que o gestor escreveu no typeform
-    :param email: email que o gestor escreveu no typeform
-    :param conteudos_selecionados: conteúdos selecionados pelo gestor no typeform
-    :param conteudos: conteudos resultantes da função get_contents para serem buscados
-    :return: retorna o user_id
-    """
-
-    content_uuids = find_uuid_by_title(conteudos, conteudos_selecionados)
-    print(content_uuids)
-
-    body = {
-        "name": name,
-        "email": email,
-        "sendConfirmationEmail": "true",
-        "contentsToEnroll": content_uuids
-    }
-
-    headers = {
-        "api_key": api_key,
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}"
-    }
-
-    response_post = requests.post(endpoint_register, headers=headers, json=body)
-
-    response_json = response_post.json()
-    user_id = response_json['id']
-    if type(user_id) is int:
-        return user_id
-    else:
-        return response_json
 
 def inactivate(email, token):
     """

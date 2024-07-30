@@ -27,7 +27,6 @@ from functions import register
 from functions import get_enrollments
 from functions import identify_users_enrollments
 from functions import restore_enrollments
-from functions import register_with_contents
 from functions import inactivate
 from functions import revoke_all
 
@@ -46,33 +45,6 @@ if input_data['action'] == 'update':
         print(f"ID do membro {email}: {member_id}. \n 3/4 etapas")
         status_enroll = enroll(member_id, conteudos=conteudos, conteudos_selecionados=conteudos_selecionados, token=token)
         print(f"Matrículas realizadas: {status_enroll}. \n 4/4 etapas.")
-    except KeyError as e:
-        print(e)
-
-elif input_data['action'] == 'create':
-    try:
-        print(f"Operação a ser realizada: {input_data['action']}. \n 0/4 etapas concluídas")
-        token = auth()
-        print(f"Autenticação realizada. \n 1/4 etapas concluídas")
-        nome = input_data['name']
-        group_id = input_data['group_id']
-        tenant_uuid = input_data['tenant_uuid']
-        email = input_data['email_create']
-        conteudos = get_contents(token)
-        conteudos_selecionados = input_data['contents_create'] #.split(",")
-        print(f"Dados a serem preenchidos: \n nome: {nome}; \n email: {email}; \n turma: {group_id}; \n plataforma: {tenant_uuid}; \nConteúdos Selecionados: {conteudos_selecionados}")
-        # conteudos_selecionados = [i.strip() for i in conteudos_selecionados]
-        member_id = register_with_contents(token=token,
-                                           name=nome,
-                                           email=email,
-                                           conteudos_selecionados=conteudos_selecionados,
-                                           conteudos=conteudos)
-        print(f"Resposta do register_with_contents: {member_id}. \n 2/4 etapas")
-        response_enroll_group = enroll_group(token, member_id, group_id)
-        print(f"Resposta do enroll_group: {response_enroll_group}. \n 3/4 etapas")
-        response_enroll_tenant = enroll_tenant(token, member_id, tenant_uuid)
-        print(f"Resposta do enroll_tenant: {response_enroll_tenant}. \n 4/4 etapas")
-
     except KeyError as e:
         print(e)
 
@@ -119,19 +91,20 @@ elif input_data['action'] == 'create_track_new_user':
 
 elif input_data['action'] == 'create_track_existing_user':
     try:
-        print(f"Operação a ser realizada {input_data['action']}. \n 0/X etapas concluídas.")
+        print(f"Operação a ser realizada {input_data['action']}. \n 0/4 etapas concluídas.")
         token = auth()
         email = input_data['email_create_track_existing']
         conteudos_selecionados = input_data['contents_create_track_existing']#.split(",") # esta e a próxima linha precisam ser descomentadas para funcionar corretamente no Zapier
         # conteudos_selecionados = [i.strip() for i in conteudos_selecionados]
+        print(f"Conteúdos selecionados: \n {conteudos_selecionados} \n 1/4 etapas concluídas")
         conteudos = get_contents(token)
         member_id = identify(email=email)
-        print(f"Email existente: {email}. Identificador: {member_id}")
+        print(f"Email existente: {email}. Identificador: {member_id} \n 2/4 etapas concluídas")
         enrolled_contents = enroll(member_id=member_id, conteudos=conteudos, conteudos_selecionados=conteudos_selecionados, token=token)
-        print(f"{len(enrolled_contents)} matrículas realizadas. Os ids são: {enrolled_contents} \n 4/X etapas concluídas")
+        print(f"{len(enrolled_contents)} matrículas realizadas. Os ids são: {enrolled_contents} \n 3/4 etapas concluídas")
         revoked_contents = revoke(enrolled_contents, token=token)
         conteudos_selecionados.pop(0)
-        print(f"Os conteúdos: \n {conteudos_selecionados} \n foram bloqueados para o aluno {email} identificador {member_id}")
+        print(f"Os conteúdos: \n {conteudos_selecionados} \n foram bloqueados para o aluno {email} identificador {member_id}. \n Etapa 4/4 realizada")
     except KeyError as e:
         print(e)
 
@@ -158,19 +131,19 @@ elif input_data['action'] == 'release_track':
 
 elif input_data['action'] == 'revoke_all':
     try:
-        print(f"Operação a ser realizada {input_data['action']}. \n 0/X etapas concluídas.")
+        print(f"Operação a ser realizada {input_data['action']}. \n 0/3 etapas concluídas.")
         token = auth()
         email = input_data['email_revoke_all']
         conteudos_selecionados = input_data['contents_to_revoke']#.split(",") # esta e a próxima linha precisam ser descomentadas para funcionar corretamente no Zapier
         # conteudos_selecionados = [i.strip() for i in conteudos_selecionados]
         conteudos = get_contents(token)
         member_id = identify(email)
-        print(f"Email existente: {email}. Identificador: {member_id}")
+        print(f"Email existente: {email}. Identificador: {member_id}. \n 1/3 etapas concluídas")
         enrollments = get_enrollments(token)
         content_ids = find_id_by_title(conteudos, conteudos_selecionados)
         member_enrollments = identify_users_enrollments(enrollments, member_id=member_id, content_ids=content_ids)
-        print(f"Matrículas identificadas: {member_enrollments}")
+        print(f"Matrículas identificadas: {member_enrollments} \n 2/3 etapas concluídas")
         revoked_contents = revoke_all(enrollments=member_enrollments, token=token)
-        print(f"Os conteúdos: \n {conteudos_selecionados} \n foram bloqueados para o aluno {email} identificador {member_id}")
+        print(f"Os conteúdos: \n {conteudos_selecionados} \n foram bloqueados para o aluno {email} identificador {member_id} \n 3/3 etapas concluídas")
     except KeyError as e:
         print(e)
