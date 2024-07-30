@@ -382,3 +382,21 @@ def restore_enrollments(enrollments, token):
         endpoint = endpoint_restore_enrollments + f"/{i}/restore"
         response = requests.patch(endpoint, headers=headers, json=body)
         return enrollments
+
+def revoke_all(enrollments, token):
+    """
+    Função que revoga o acesso dos cursos que devem ser bloqueados ao usuário.
+    :param enrollments: lista de ids dos cursos que devem ser bloqueados
+    :param token: token resultado da função auth
+    :return: lista de matrículas revogadas
+    """
+
+    for i in enrollments:
+        endpoint = f"https://clas.curseduca.pro/enrollments/{i}"
+        headers = {
+            "api_key": api_key,
+            "Authorization": f"Bearer {token}",
+            "accept": "application/json"
+        }
+        response = requests.delete(endpoint, headers=headers)
+    return enrollments

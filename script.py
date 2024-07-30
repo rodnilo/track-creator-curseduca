@@ -29,6 +29,7 @@ from functions import identify_users_enrollments
 from functions import restore_enrollments
 from functions import register_with_contents
 from functions import inactivate
+from functions import revoke_all
 
 if input_data['action'] == 'update':
     try:
@@ -151,5 +152,25 @@ elif input_data['action'] == 'release_track':
         print(f"{len(member_enrollments)} identificado para liberação, identificador {member_enrollments}. \n 2/3 etapas concluídas")
         restored_enrollments = restore_enrollments(member_enrollments, token=token)
         print(f"{len(restored_enrollments)} identificado para liberação, identificador {member_enrollments}. \n 3/3 etapas concluídas")
+    except KeyError as e:
+        print(e)
+
+
+elif input_data['action'] == 'revoke_all':
+    try:
+        print(f"Operação a ser realizada {input_data['action']}. \n 0/X etapas concluídas.")
+        token = auth()
+        email = input_data['email_revoke_all']
+        conteudos_selecionados = input_data['contents_to_revoke']#.split(",") # esta e a próxima linha precisam ser descomentadas para funcionar corretamente no Zapier
+        # conteudos_selecionados = [i.strip() for i in conteudos_selecionados]
+        conteudos = get_contents(token)
+        member_id = identify(email)
+        print(f"Email existente: {email}. Identificador: {member_id}")
+        enrollments = get_enrollments(token)
+        content_ids = find_id_by_title(conteudos, conteudos_selecionados)
+        member_enrollments = identify_users_enrollments(enrollments, member_id=member_id, content_ids=content_ids)
+        print(f"Matrículas identificadas: {member_enrollments}")
+        revoked_contents = revoke_all(enrollments=member_enrollments, token=token)
+        print(f"Os conteúdos: \n {conteudos_selecionados} \n foram bloqueados para o aluno {email} identificador {member_id}")
     except KeyError as e:
         print(e)
